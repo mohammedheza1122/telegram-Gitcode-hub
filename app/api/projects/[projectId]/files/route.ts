@@ -3,10 +3,6 @@ import { authenticateTelegram } from "../../../../../lib/api-auth";
 
 type Params = { params: Promise<{ projectId: string }> };
 
-async function ownedProject(admin: NonNullable<Awaited<ReturnType<typeof authenticateTelegram>> extends infer T ? any : never>, userId: number, projectId: number) {
-  return admin.from("projects").select("id,name,default_branch").eq("id", projectId).eq("owner_id", userId).maybeSingle();
-}
-
 export async function GET(request: Request, { params }: Params) {
   const auth = await authenticateTelegram(request);
   if ("response" in auth) return auth.response;
