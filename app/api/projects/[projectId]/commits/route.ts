@@ -33,12 +33,23 @@ export async function POST(request: Request, { params }: Params) {
   if (!message || message.length > 200) return NextResponse.json({ ok: false, error: "Commit message is required and must be at most 200 characters" }, { status: 400 });
   if (!Array.isArray(body?.files) || body.files.length > 500) return NextResponse.json({ ok: false, error: "Invalid commit files" }, { status: 400 });
 
-  const files = body.files.map((file) => ({
-    path: String(file.path ?? "").trim(),
-    content: String(file.content ?? ""),
-  }));
+  const files = body.files.map((file) => ({ path: String(file.path ?? "").trim(), content: String(file.content ?? "") }));
   if (files.some((file) => !file.path || file.path.length > 500 || file.path.startsWith("/") || file.path.includes(".."))) {
     return NextResponse.json({ ok: false, error: "Invalid file path" }, { status: 400 });
+  }
+
+  // Persist the working tree first, then snapshot exactly what was committed.
+  const now = new Date().toISOString();
+  const upserts = files.map((file) => ({
+    project_id: projectId,
+    path: file.path,
+    content: file.content,
+    size_bytes: Buffer.byteLength(file.content, "utf8"),
+    updated_at: now,
+  }));
+  if (upserts.length) {
+    const { error } = await auth.admin.from("files").upsert(upserts, { onConflict: "project_id,path" });
+    if (error) return NextResponse.json({ ok: false, error: "Unable to save files before commit" }, { status: 500 });
   }
 
   const { data: commit, error: commitError } = await auth.admin
@@ -49,14 +60,14 @@ export async function POST(request: Request, { params }: Params) {
   if (commitError || !commit) return NextResponse.json({ ok: false, error: "Unable to create commit" }, { status: 500 });
 
   const { data: currentFiles, error: currentError } = await auth.admin.from("files").select("id,path,content").eq("project_id", projectId);
-  if (currentError) return NextResponse.json({ ok: false, error: "Commit created but current files could not be loaded" }, { status: 500 });
+  if (currentError) return NextResponse.json({ ok: false, error: "Commit created but snapshot could not be loaded" }, { status: 500 });
 
-  const fileRows = (currentFiles ?? []).filter((file) => files.some((candidate) => candidate.path === file.path));
-  if (fileRows.length) {
-    const { error } = await auth.admin.from("commit_files").insert(fileRows.map((file) => ({ commit_id: commit.id, file_id: file.id, content: file.content })));
+  const snapshots = (currentFiles ?? []).map((file) => ({ commit_id: commit.id, file_id: file.id, content: file.content }));
+  if (snapshots.length) {
+    const { error } = await auth.admin.from("commit_files").insert(snapshots);
     if (error) return NextResponse.json({ ok: false, error: "Commit created but snapshot could not be saved" }, { status: 500 });
   }
 
-  await auth.admin.from("projects").update({ updated_at: new Date().toISOString() }).eq("id", projectId);
+  await auth.admin.from("projects").update({ updated_at: now }).eq("id", projectId);
   return NextResponse.json({ ok: true, commit }, { status: 201 });
 }
