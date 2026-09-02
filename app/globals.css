@@ -8,12 +8,15 @@ button { cursor: pointer; }
 .brand { display: flex; align-items: center; gap: 12px; }
 .logo { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; background: #229ed9; font-weight: 800; }
 .muted { color: #9aa6bd; }
+.statusRow { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 .badge { border: 1px solid #28405f; background: #101a2d; color: #8ed8ff; padding: 7px 10px; border-radius: 999px; font-size: 12px; }
 .dashboard { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 280px 1fr; gap: 18px; }
 .card { background: #10182a; border: 1px solid #202e46; border-radius: 16px; padding: 18px; box-shadow: 0 12px 40px rgba(0,0,0,.18); }
 .sidebar h2 { margin-top: 0; font-size: 18px; }
 .repo { padding: 12px; border-radius: 10px; background: #162238; border: 1px solid #263a58; }
-.repo strong { display:block; margin-bottom: 5px; }
+.repo strong, .userBox strong { display:block; margin-bottom: 5px; }
+.userBox { margin-top: 10px; padding: 12px; border-radius: 10px; background: #0d1525; border: 1px solid #263a58; }
+.errorBox { margin-top: 10px; padding: 9px; border-radius: 8px; border: 1px solid #713b48; background: #28151b; color: #ffb7c4; font-size: 12px; }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .btn { border: 1px solid #2d4262; background: #17243a; color: #e8edf7; padding: 9px 12px; border-radius: 9px; }
 .btn.primary { background: #229ed9; border-color: #229ed9; color: white; }
@@ -34,4 +37,4 @@ button { cursor: pointer; }
 .history { margin-top:14px; }
 .historyItem { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #1d2940; gap:12px; }
 .empty { display:grid; place-items:center; min-height:260px; color:#8795ad; text-align:center; padding:30px; }
-@media (max-width: 900px) { .shell { padding:14px; } .dashboard { grid-template-columns:1fr; } .editorGrid { grid-template-columns: 1fr; } .tree { border-left:0; border-bottom:1px solid #202e46; max-height:190px; overflow:auto; } .header { align-items:flex-start; } }
+@media (max-width: 900px) { .shell { padding:14px; } .dashboard { grid-template-columns:1fr; } .editorGrid { grid-template-columns: 1fr; } .tree { border-left:0; border-bottom:1px solid #202e46; max-height:190px; overflow:auto; } .header { align-items:flex-start; flex-direction:column; } .statusRow { justify-content:flex-start; } }
