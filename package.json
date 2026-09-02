@@ -8,10 +8,11 @@
     "start": "next start"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.57.4",
+    "jszip": "3.10.1",
     "next": "15.5.7",
     "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "jszip": "3.10.1"
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@types/node": "22.15.0",
