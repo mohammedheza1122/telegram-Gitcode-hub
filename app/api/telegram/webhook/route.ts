@@ -37,8 +37,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, ignored: true });
     }
 
-    const text = message.text?.trim() ?? "";
-    const firstName = message.from?.first_name?.trim() || "صديقي";
+    const text = message?.text?.trim() ?? "";
+    const firstName = message?.from?.first_name?.trim() || "صديقي";
 
     if (text === "/start" || text.startsWith("/start ")) {
       await sendTelegramMessage(
